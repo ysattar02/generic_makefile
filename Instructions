@@ -1,0 +1,7 @@
+.
+├── Makefile
+├── src
+│   ├── main.cpp
+│   └── other_source.cpp
+└── build
+└── bin
