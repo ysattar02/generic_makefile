@@ -1,30 +1,40 @@
-# Compiler and flags
-CC = g++
-CFLAGS = -std=c++11 -Wall
-
+# Compiler
+CXX := g++
+# Compiler flags
+CXXFLAGS := -Wall -Wextra -std=c++17
+# Directories
+SRCDIR := src
+BUILDDIR := build
+BINDIR := bin
 # Target executable
-TARGET = YOUR_TARGET
+TARGET := $(BINDIR)/my_program
 
-# Source files (only .cpp files)
-SRCS = YOUR_SOURCE_FILES
-
-# Object files (automatically derived from SRCS)
-OBJS = $(SRCS:.cpp=.o)
-
-# Phony targets
-.PHONY: all clean
+# Find all .cpp files in the src directory
+SOURCES := $(wildcard $(SRCDIR)/*.cpp)
+# Replace .cpp with .o and move to the build directory
+OBJECTS := $(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.o,$(SOURCES))
 
 # Default target
 all: $(TARGET)
 
-# Linking the object files to create the executable
-$(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS)
+# Link all object files into the target executable
+$(TARGET): $(OBJECTS) | $(BINDIR)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $(TARGET)
 
-# Compiling .cpp files to .o files
-%.o: %.cpp %.h
-	$(CC) $(CFLAGS) -c $< -o $@
+# Compile source files into object files in the build directory
+$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp | $(BUILDDIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Clean up the build
+# Create necessary directories if they don't exist
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
+
+$(BINDIR):
+	mkdir -p $(BINDIR)
+
+# Clean up generated files
 clean:
-	rm -f $(TARGET) $(OBJS)
+	rm -rf $(BUILDDIR) $(BINDIR)
+
+# Phony targets to avoid conflicts with files of the same name
+.PHONY: all clean
